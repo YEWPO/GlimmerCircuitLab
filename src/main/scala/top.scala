@@ -2,7 +2,7 @@ import chisel3._
 import chisel3.util._
 
 object Top extends App {
-  emitVerilog(new Top, Array("--target-dir", "generated"))
+  emitVerilog(new Transplay, Array("--target-dir", "generated"))
 }
 
 class M2A extends Module {
@@ -87,6 +87,31 @@ class Transplay extends Module {
     val count = Input(UInt(8.W))
     val out = Output(Vec(8, UInt(8.W)))
   })
+  
+  val mcodel = Module(new HexEncoder)
+  val mcodeh = Module(new HexEncoder)
+  mcodel.io.in := io.mcode(3, 0)
+  mcodeh.io.in := io.mcode(7, 4)
+  io.out(0) := mcodel.io.out
+  io.out(1) := mcodeh.io.out
+
+  io.out(2) := "hff".U
+
+  val asciil = Module(new HexEncoder)
+  val asciih = Module(new HexEncoder)
+  asciil.io.in := io.ascii(3, 0)
+  asciih.io.in := io.ascii(7, 4)
+  io.out(3) := asciil.io.out
+  io.out(4) := asciih.io.out
+
+  io.out(5) := "hff".U
+
+  val countl = Module(new HexEncoder)
+  val counth = Module(new HexEncoder)
+  countl.io.in := io.count(3, 0)
+  counth.io.in := io.count(7, 4)
+  io.out(6) := countl.io.out
+  io.out(7) := counth.io.out
 }
 
 class Top extends Module {
